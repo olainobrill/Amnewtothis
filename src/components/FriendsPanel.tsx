@@ -16,7 +16,6 @@ export function FriendsPanel({ initialQuery = "" }: { initialQuery?: string }) {
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   const load = async () => {
-    setLoading(true);
     const res = await fetch("/api/friends");
     const data = await res.json();
     setFriends(data.friends);
@@ -25,16 +24,7 @@ export function FriendsPanel({ initialQuery = "" }: { initialQuery?: string }) {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-    if (initialQuery.trim()) {
-      runSearch(initialQuery);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const runSearch = async (q: string) => {
-    setQuery(q);
+  const performSearch = async (q: string) => {
     if (!q.trim()) {
       setResults(null);
       return;
@@ -44,6 +34,20 @@ export function FriendsPanel({ initialQuery = "" }: { initialQuery?: string }) {
     const data = await res.json();
     setResults(data.users);
     setSearching(false);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load();
+    if (initialQuery.trim()) {
+      performSearch(initialQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const runSearch = (q: string) => {
+    setQuery(q);
+    performSearch(q);
   };
 
   const sendRequest = async (userId: string) => {

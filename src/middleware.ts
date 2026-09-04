@@ -2,13 +2,14 @@ import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/register"];
+const PUBLIC_API_PATHS = ["/api/auth", "/api/register"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
-  const isApiAuth = pathname.startsWith("/api/auth");
+  const isPublicApi = PUBLIC_API_PATHS.some((p) => pathname.startsWith(p));
 
-  if (!req.auth && !isPublic && !isApiAuth) {
+  if (!req.auth && !isPublic && !isPublicApi) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
     return NextResponse.redirect(loginUrl);
   }
